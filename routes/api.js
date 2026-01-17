@@ -45,11 +45,57 @@ export default function (app) {
       }
     })
 
-    .put(function (req, res) {
-      res.json({});
+    .put(async function (req, res) {
+      const { _id, ...updateFields } = req.body;
+
+      if (!_id) {
+        return res.json({ error: "missing _id" });
+      }
+
+      if (Object.keys(updateFields).length === 0) {
+        return res.json({ error: "no update field(s) sent", _id: _id });
+      }
+
+      try {
+        const updatedIssue = await Issue.findByIdAndUpdate(
+          _id,
+          { $set: updateFields },
+          { new: true },
+        );
+
+        if (!updatedIssue) {
+          return res.json({ error: "could not update", _id: _id });
+        }
+
+        res.json({
+          result: "successfully updated",
+          _id: _id,
+        });
+      } catch (err) {
+        res.json({ error: "could not update", _id: _id });
+      }
     })
 
-    .delete(function (req, res) {
-      res.json({});
+    .delete(async function (req, res) {
+      const { _id } = req.body;
+
+      if (!_id) {
+        return res.json({ error: "missing _id" });
+      }
+
+      try {
+        const deletedIssue = await Issue.findByIdAndDelete(_id);
+
+        if (!deletedIssue) {
+          return res.json({ error: "could not delete", _id: _id });
+        }
+
+        res.json({
+          result: "successfully deleted",
+          _id: _id,
+        });
+      } catch (err) {
+        res.json({ error: "could not delete", _id: _id });
+      }
     });
 }
