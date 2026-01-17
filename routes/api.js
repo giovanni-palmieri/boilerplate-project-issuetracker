@@ -9,7 +9,7 @@ export default function (app) {
       const { project } = req.params;
 
       try {
-        const issues = await Issue.find({ project: project });
+        const issues = await Issue.find({ project, ...req.query });
         res.json(issues);
       } catch (err) {
         res.json({ error: "Could not post issue", message: err.message });
