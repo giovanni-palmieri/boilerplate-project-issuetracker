@@ -6,7 +6,14 @@ export default function (app) {
     .route("/api/issues/:project")
 
     .get(async function (req, res) {
-      res.json({});
+      const { project } = req.params;
+
+      try {
+        const issues = await Issue.find({ project: project });
+        res.json(issues);
+      } catch (err) {
+        res.json({ error: "Could not post issue", message: err.message });
+      }
     })
 
     .post(async function (req, res) {
